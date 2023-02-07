@@ -1,0 +1,15 @@
+transformers==4.25.1
+sentence-transformers==2.2.2
+sentencepiece==0.1.96
+wandb==0.13.9
+numpy==1.22.2
+tqdm>=4.62.2
+tensorboardX==2.5.1
+nltk==3.8.1
+yacs==0.1.8
+dill==0.3.6
+datasets==2.8.0
+rouge==1.0.0
+pyarrow==10.0.1
+scikit-learn==1.2.0
+scipy==1.8.0

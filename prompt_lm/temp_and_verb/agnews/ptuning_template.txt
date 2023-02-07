@@ -1,0 +1,4 @@
+{"soft"} {"mask"} news {"soft"} {"placeholder": "text_a"} {"placeholder": "text_b"}
+{"placeholder": "text_a"} {"placeholder": "text_b"} {"soft"} topic {"soft"} {"soft"} {"mask"} {"soft"}.
+{"soft"} Category {"soft"} {"mask"} {"soft"} {"placeholder": "text_a"} {"placeholder": "text_b"}
+{"soft"} Topic {"soft"} {"mask"} {"soft"} {"placeholder": "text_a"} {"placeholder": "text_b"}
