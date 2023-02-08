@@ -11,7 +11,7 @@ If you have any questions, feel free to email Yuxin (<ywen@umd.edu>).
 From a given image, we first optimize a hard prompt using the PEZ algorithm and CLIP encoders. Then, we take the optimized prompts and feed them into Stable Diffusion to generate new images. The name PEZ (hard ***P***rompts made ***E***a**Z**y) was inspired from the [PEZ candy dispenser](https://us.pez.com/collections/dispensers).
 
 ## Try out
-You can try out our demos on Colab [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1VSFps4siwASXDwhK_o29dKA9COvTnG8A?usp=sharing) or Huggingface Space [![Generic badge](https://img.shields.io/badge/🤗-Open%20in%20Spaces-blue.svg)](https://huggingface.co/spaces/tomg-group-umd/pez-dispenser).
+You can try out our demos on Colab [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1VSFps4siwASXDwhK_o29dKA9COvTnG8A?usp=sharing) or Hugging Face Space [![Generic badge](https://img.shields.io/badge/🤗-Open%20in%20Spaces-blue.svg)](https://huggingface.co/spaces/tomg-group-umd/pez-dispenser).
 
 More Jupyter notebook examples can be found in the `examples/` folder.
 
