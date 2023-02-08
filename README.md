@@ -2,7 +2,7 @@
 
 <img src=examples/teaser.png  width="70%" height="40%">
 
-This code is the official implementation of [Hard Prompts Made Easy]().
+This code is the official implementation of [Hard Prompts Made Easy](https://arxiv.org/abs/2302.03668).
 
 If you have any questions, feel free to email Yuxin (<ywen@umd.edu>).
 
