@@ -25,7 +25,7 @@ args = argparse.Namespace()
 args.__dict__.update(read_json(config_path))
 
 # You may modify the hyperparamters here
-# args.print_new_best = True
+args.print_new_best = True
 
 # load CLIP model
 device = "cuda" if torch.cuda.is_available() else "cpu"
