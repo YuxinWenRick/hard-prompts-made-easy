@@ -26,36 +26,43 @@ We recommand to run more shots to obtain more desirable prompts.
 - ftfy >= 6.1.1
 - mediapy >= 1.1.2
 
-## Usage
-```python
-import open_clip
-from optim_utils import * 
-import argparse
-from PIL import Image
+## Setup
 
-# load the target image
-image = Image.open(image_path)
+Ensure you have python 3 installed.
 
-# load args
-args = argparse.Namespace()
-args.__dict__.update(read_json("sample_config.json"))
-
-# load CLIP model
-device = "cuda" if torch.cuda.is_available() else "cpu"
-model, _, preprocess = open_clip.create_model_and_transforms(args.clip_model, pretrained=args.clip_pretrain, device=device)
-
-# You may modify the hyperparamters
-args.prompt_len = 8 # number of tokens for the learned prompt
-
-# optimize prompt
-learned_prompt = optimize_prompt(model, preprocess, args, device, target_images=[image])
-print(learned_prompt)
+Create a virtual environment, activate it, and install dependencies:
+```sh
+$ python -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements.txt
 ```
 
-Note: \
-```prompt_len```: number of tokens in the optimized prompt \
-```batch_size```: number of target images/prompts been used for each iteraion \
-```prompt_bs```: number of intializations
+## Usage
 
-## Langugae Model Prompt Experiments
+A script is provided to perform prompt inversion (finding a prompt from an image or set of images). For examples of other usages, see [the examples folder](./examples).
+
+```sh
+python run.py image.png
+```
+
+You can pass multiple images to optimize a prompt across all images.
+
+## Parameters
+
+Config can be loaded from a JSON file. A sample config is provided at [./sample-config.json](sample_config.json).
+
+Config has the following parameters:
+
+- `prompt_len`: the number of tokens in the optimized prompt. 16 empirically results in the most generalizable performance. more is not necessarily better.
+- `iter`: the total number of iterations to run for.
+- `lr`: the learning weight for the [optimizer](https://pytorch.org/docs/stable/generated/torch.optim.AdamW.html).
+- `weight_decay`: the weight decay for the optimizer.
+- `prompt_bs`: number of initializations.
+- `batch_size`: number of target images/prompts used for each iteration.
+- `clip_model`: the name of the CLiP model for use with . `"ViT-H-14"` is the model used in SD 2.0 and Midjourney. `"ViT-L-14"` is the model used in SD 1.5. This should ideally match your target generator.
+- `clip_pretrain`: the name of the pretrained model for [open_clip](https://github.com/mlfoundations/open_clip). For `"ViT-H-14"` use `"laion2b_s32b_b79k"`. For `"ViT-L-14"` use `"openai"`.
+- `print_step`: if not null, how often (in steps) to print a line giving current status.
+- `print_new_best`: whether to print out new best prompts whenver found. will be quite noisy initially.
+
+## Language Model Prompt Experiments
 You may check the code in `prompt_lm/` folder.
