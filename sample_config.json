@@ -4,6 +4,7 @@
     "lr": 0.1,
     "weight_decay": 0.1,
     "prompt_bs": 1,
+    "loss_weight": 1.0,
     "print_step": 100,
     "batch_size": 1,
     "clip_model": "ViT-H-14",

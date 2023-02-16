@@ -1,4 +1,4 @@
-# Hard Prompts Made Easy: Discrete Prompt Tuning for Language Models
+# Hard Prompts Made Easy: Gradient-Based Discrete Optimization for Prompt Tuning and Discovery
 
 <img src=examples/teaser.png  width="70%" height="40%">
 

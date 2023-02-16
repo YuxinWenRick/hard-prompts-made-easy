@@ -147,7 +147,7 @@ def optimize_prompt_loop(model, tokenizer, token_embedding, all_target_features,
     # get optimizer
     input_optimizer = torch.optim.AdamW([prompt_embeds], lr=lr, weight_decay=weight_decay)
 
-    best_sim = 0
+    best_sim = -1000 * args.loss_weight
     best_text = ""
 
     for step in range(opt_iters):
@@ -186,6 +186,7 @@ def optimize_prompt_loop(model, tokenizer, token_embedding, all_target_features,
         logits_per_image, _ = model.forward_text_embedding(padded_embeds, dummy_ids, target_features)
         cosim_scores = logits_per_image
         loss = 1 - cosim_scores.mean()
+        loss = loss * args.loss_weight
         
         prompt_embeds.grad, = torch.autograd.grad(loss, [tmp_embeds])
         
@@ -202,7 +203,7 @@ def optimize_prompt_loop(model, tokenizer, token_embedding, all_target_features,
                 per_step_message = f"\n{per_step_message}, cosim: {universal_cosim_score:.3f}, text: {decoded_text}"
             print(per_step_message)
 
-        if best_sim < universal_cosim_score:
+        if best_sim * args.loss_weight < universal_cosim_score * args.loss_weight:
             best_sim = universal_cosim_score
             best_text = decoded_text
             if print_new_best:
