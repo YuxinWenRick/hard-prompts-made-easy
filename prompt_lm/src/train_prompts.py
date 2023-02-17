@@ -15,7 +15,8 @@ from datasets import load_dataset
 from openprompt.plms import load_plm
 from utils import nn_project
 import wandb
-
+from transformers import  AdamW, get_linear_schedule_with_warmup,get_constant_schedule_with_warmup  # use AdamW is a standard practice for transformer
+from transformers.optimization import Adafactor  # use Adafactor is the default setting for T5
 
 ########### 
 # Adapted from https://github.com/thunlp/OpenPrompt/blob/main/tutorial/1.4_soft_template.py 
@@ -42,6 +43,9 @@ parser.add_argument("--prompt_lr", type=float, default=0.3)
 parser.add_argument("--warmup_step_prompt", type=int, default=500)
 parser.add_argument("--init_from_vocab", type=bool, default=False)
 parser.add_argument("--eval_every_steps", type=int, default=500)
+parser.add_argument("--train_batch_size", type=int, default=16)
+parser.add_argument("--eval_batch_size", type=int, default=16)
+parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
 parser.add_argument("--soft_token_num", type=int, default=100)
 parser.add_argument("--optimizer", type=str, default="Adafactor")
 parser.add_argument("--PEZ_discrete_prompt", type=int, default=0, help="(int 1/0) 1 if using PEZ algorithm to create soft prompt, else soft prompt training; default is 0")
@@ -92,15 +96,13 @@ print(tokenizer)
 if args.dataset == "sst2":
     raw_dataset = load_dataset("glue", "sst2")
     dataset = {}
-    
     train_dataset_size = len(raw_dataset['train'])
     holdout_indicies = np.random.choice(train_dataset_size, args.dataset_holdout, replace=False)
     dataset["holdout"] = []
     for split in ['train', 'validation', 'test']:
         dataset[split] = []
         for idx,data in enumerate(raw_dataset[split]):
-            # if data['sentence'][-1] == " ":
-            #     data['sentence'] = data['sentence'][:-1] + "." # similar to FluentPrompt
+
             input_example = InputExample(text_a = data['sentence'], label=int(data['label']), guid=idx)
             if split == 'train' and idx in holdout_indicies:
                 dataset["holdout"].append(input_example)
@@ -110,16 +112,15 @@ if args.dataset == "sst2":
     scriptsbase = "temp_and_verb/SST2"
     scriptformat = "txt"
     max_seq_l = 128 
-    # max_seq_l = 480 # this should be specified according to the running GPU's capacity
     if args.tune_plm: # tune the entire plm will use more gpu-memories, thus we should use a smaller batch_size.
-        batchsize_t = 4
-        batchsize_e = 4
-        gradient_accumulation_steps = 8
+        batchsize_t = args.train_batch_size
+        batchsize_e = args.eval_batch_size
+        gradient_accumulation_steps = args.gradient_accumulation_steps
         model_parallelize = True # if multiple gpus are available, one can use model_parallelize
     else:
-        batchsize_t = 8
-        batchsize_e = 16
-        gradient_accumulation_steps = 4
+        batchsize_t = args.train_batch_size
+        batchsize_e = args.eval_batch_size
+        gradient_accumulation_steps = args.gradient_accumulation_steps
         model_parallelize = False
 elif args.dataset == "ag_news":
     raw_dataset = load_dataset("ag_news")
@@ -132,10 +133,7 @@ elif args.dataset == "ag_news":
     for split in ['train', 'test']:
         dataset[split] = []
         for idx,data in enumerate(raw_dataset[split]):
-            # if data['sentence'][-1] == " ":
-            #     data['sentence'] = data['sentence'][:-1] + "." # similar to FluentPrompt
-            input_example = InputExample(text_a = data['text'], label=int(data['label']), guid=idx)
-            
+            input_example = InputExample(text_a = data['text'], label=int(data['label']), guid=idx)     
             # To account for no validation set; turn test into validation so functions with the rest of the code
             if split == 'test':
                 dataset["validation"].append(input_example) 
@@ -148,23 +146,21 @@ elif args.dataset == "ag_news":
     scriptsbase = "temp_and_verb/agnews"
     scriptformat = "txt"
     max_seq_l = 256 
-    # max_seq_l = 480 # this should be specified according to the running GPU's capacity
     if args.tune_plm: # tune the entire plm will use more gpu-memories, thus we should use a smaller batch_size.
-        batchsize_t = 4
-        batchsize_e = 4
-        gradient_accumulation_steps = 8
+        batchsize_t = args.train_batch_size
+        batchsize_e = args.eval_batch_size
+        gradient_accumulation_steps = args.gradient_accumulation_steps
         model_parallelize = True # if multiple gpus are available, one can use model_parallelize
     else:
-        batchsize_t = 8
-        batchsize_e = 16
-        gradient_accumulation_steps = 4
+        batchsize_t = args.train_batch_size
+        batchsize_e = args.eval_batch_size
+        gradient_accumulation_steps = args.gradient_accumulation_steps
         model_parallelize = False
 elif args.dataset == "amazon":
     raw_dataset = load_dataset("amazon_polarity")
     dataset = {}
     dataset["holdout"] = []
     dataset["validation"] = []
-    
     test_dataset_size = len(raw_dataset['test'])
     holdout_indicies = np.random.choice(len(raw_dataset['train']), args.dataset_holdout, replace=False)
     train_indicies = np.random.choice(len(raw_dataset['train']), 2*args.dataset_holdout+32*(args.max_steps+1)) # only tokenize however many we need 
@@ -185,16 +181,15 @@ elif args.dataset == "amazon":
     scriptsbase = "temp_and_verb/amazon"
     scriptformat = "txt"
     max_seq_l = 256 
-    # max_seq_l = 480 # this should be specified according to the running GPU's capacity
     if args.tune_plm: # tune the entire plm will use more gpu-memories, thus we should use a smaller batch_size.
-        batchsize_t = 4
-        batchsize_e = 4
-        gradient_accumulation_steps = 8
+        batchsize_t = args.train_batch_size
+        batchsize_e = args.eval_batch_size
+        gradient_accumulation_steps = args.gradient_accumulation_steps
         model_parallelize = True # if multiple gpus are available, one can use model_parallelize
     else:
-        batchsize_t = 8
-        batchsize_e = 16
-        gradient_accumulation_steps = 4
+        batchsize_t = args.train_batch_size
+        batchsize_e = args.eval_batch_size
+        gradient_accumulation_steps = args.gradient_accumulation_steps
         model_parallelize = False
 else:
     raise NotImplementedError
@@ -237,12 +232,10 @@ train_dataloader = PromptDataLoader(dataset=dataset["train"], template=mytemplat
     tokenizer_wrapper_class=WrapperClass, max_seq_length=max_seq_l, decoder_max_length=5,
     batch_size=batchsize_t,shuffle=True, teacher_forcing=False, predict_eos_token=False,
     truncate_method="tail")
-
 validation_dataloader = PromptDataLoader(dataset=dataset["validation"], template=mytemplate, tokenizer=tokenizer,
     tokenizer_wrapper_class=WrapperClass, max_seq_length=max_seq_l, decoder_max_length=5,
     batch_size=batchsize_e,shuffle=False, teacher_forcing=False, predict_eos_token=False,
     truncate_method="tail")
-
 holdout_dataloader = PromptDataLoader(dataset=dataset["holdout"], template=mytemplate, tokenizer=tokenizer,
     tokenizer_wrapper_class=WrapperClass, max_seq_length=max_seq_l, decoder_max_length=5,
     batch_size=batchsize_e,shuffle=False, teacher_forcing=False, predict_eos_token=False,
@@ -281,16 +274,11 @@ def evaluate(prompt_model, dataloader, desc):
             alllabels.extend(labels.cpu().tolist())
             allpreds.extend(torch.argmax(logits, dim=-1).cpu().tolist())
 
-    # print("Steps in Dataloader: ", step)
-    # print("Average Loss: ", total_loss_val)
-    # print("Average Loss: ", total_loss_val/step)
     print("Prediction: ", allpreds[:10])
     print("Labels: ", alllabels[:10])
     acc = sum([int(i==j) for i,j in zip(allpreds, alllabels)])/len(allpreds)
     return acc, total_loss_val/step, log_perplexity
 
-from transformers import  AdamW, get_linear_schedule_with_warmup,get_constant_schedule_with_warmup  # use AdamW is a standard practice for transformer
-from transformers.optimization import Adafactor, AdafactorSchedule  # use Adafactor is the default setting for T5
 loss_func = torch.nn.CrossEntropyLoss()
 tot_step = args.max_steps
 
@@ -365,7 +353,7 @@ for epoch in range(1000000):
             if args.fluency_weight != 0:
                 print("Fluency Loss: ", fluency_loss)
                 print("Label Loss: ", label_loss)
-     
+
         if bool(args.PEZ_discrete_prompt) and actual_step % gradient_accumulation_steps == 0:
             ### COPY SOFT PROMPT ###
             soft_prompt_copy = prompt_model.template.soft_embeds.clone().detach()
@@ -391,7 +379,6 @@ for epoch in range(1000000):
             shift_logits = prompt_logits[..., :-1, :].contiguous()
             shift_labels = ppl_labels[..., 1:].contiguous()
             fluency_loss = loss_func(shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1))
-
             # from Open Prompt code again
             outputs = prompt_model.template.post_processing_outputs(outputs)
             outputs = prompt_model.verbalizer.gather_outputs(outputs)
@@ -404,11 +391,8 @@ for epoch in range(1000000):
             fluency_weight = args.fluency_weight
             loss = fluency_weight*fluency_loss + (1-fluency_weight)*label_loss
             loss.backward()
-            # fluency_loss = fluency_loss.detach()
-            # label_loss = label_loss.detach()
             tot_loss += loss.item()
             actual_step += 1
-        
         else:
             logits = prompt_model(inputs)
             labels = inputs['label']
@@ -418,7 +402,7 @@ for epoch in range(1000000):
             actual_step += 1
 
         ### REWRITE SOFT PROMPT FOR UPDATE ###
-        if bool(args.PEZ_discrete_prompt) and actual_step % gradient_accumulation_steps == 0:
+        if bool(args.PEZ_discrete_prompt) and actual_step % gradient_accumulation_steps == 0 and actual_step > gradient_accumulation_steps:
             prompt_model.template.soft_embeds.data = soft_prompt_copy.data
         
         if not bool(args.fluentPrompt) and actual_step % gradient_accumulation_steps == 0:
@@ -513,7 +497,15 @@ for epoch in range(1000000):
                 prompt_table.add_data(text_prompt, nn_indices, holdout_acc, log_perplexity_eval, holdout_loss, glb_step) 
             
             prompt_model.train()
-
+        
+        if bool(args.PEZ_discrete_prompt) and actual_step % gradient_accumulation_steps == 0:
+            ### COPY SOFT PROMPT ###
+            soft_prompt_copy = prompt_model.template.soft_embeds.clone().detach()
+            ### PROJECT ###
+            projected_embeds, nn_indices = nn_project(prompt_model.template.soft_embeds, prompt_model.template.raw_embedding)
+            ### PROJECTED EMBEDDING FOR FORWARD ###
+            prompt_model.template.soft_embeds.data = projected_embeds.data
+        
         if glb_step > args.max_steps:
             leave_training = True
             break
@@ -535,21 +527,9 @@ best_val_acc = -1
 
 if args.with_tracking == "True":
     wandb.log({"training_samples" : prompt_table})
-# # a simple measure for the convergence speed. From source code
-thres99 = 0.99*best_val_acc
-thres98 = 0.98*best_val_acc
-thres100 = best_val_acc
-step100=step98=step99=args.max_steps
-for val_time, acc in enumerate(acc_traces):
-    if acc>=thres98:
-        step98 = min(val_time*args.eval_every_steps, step98)
-        if acc>=thres99:
-            step99 = min(val_time*args.eval_every_steps, step99)
-            if acc>=thres100:
-                step100 = min(val_time*args.eval_every_steps, step100)
 
 
-content_write += f"BestValAcc:{best_val_acc}\tBestValAcc(From Holdout):{best_val_acc_via_holdout}\tEndValAcc:{acc_traces[-1]}\tLog PPL:{best_log_PPL_holdout}\tcritical_steps:{[step98,step99,step100]}\n"
+content_write += f"BestValAcc:{best_val_acc}\tBestValAcc(From Holdout):{best_val_acc_via_holdout}\tEndValAcc:{acc_traces[-1]}\tLog PPL:{best_log_PPL_holdout}\n"
 content_write += "\n"
 if args.with_tracking == "True": wandb.log({"Best Val Acc": best_val_acc, "Best Val Acc (From Holdout)": best_val_acc_via_holdout, "Best Log PPL (From Holdout)": best_log_PPL_holdout})
 print(content_write)

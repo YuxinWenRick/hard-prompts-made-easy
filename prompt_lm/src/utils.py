@@ -14,7 +14,6 @@ def nn_project(curr_embeds, embedding_layer):
     # a dot product exact kNN search between a set of 
     # query vectors and a corpus of vectors
     curr_embeds = curr_embeds.reshape((-1,emb_dim))
-    # print(curr_embeds.shape)
     curr_embeds = normalize_embeddings(curr_embeds) # queries
 
     embedding_matrix = embedding_layer.weight
@@ -24,9 +23,8 @@ def nn_project(curr_embeds, embedding_layer):
                             query_chunk_size=curr_embeds.shape[0], 
                             top_k=3,
                             score_function=dot_score)
-    # print(hits)
+
     nn_indices = torch.tensor([hit[0]["corpus_id"] for hit in hits], device=device)
-    # nn_indices = nn_indices.reshape((seq_len))
     projected_embeds = embedding_layer(nn_indices)
 
     return projected_embeds, nn_indices
