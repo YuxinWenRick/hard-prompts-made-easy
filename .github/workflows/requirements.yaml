@@ -19,3 +19,6 @@ jobs:
         python-version: '3.9'
     - name: Install Requirements
       run: pip install -r requirements.txt
+    - name: Analysing the code with pylint
+      run: |
+        pylint $(git ls-files '*.py')
