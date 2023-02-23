@@ -1,15 +1,18 @@
-from optim_utils import *
-import open_clip
+"""
+the following module allows you to run the optimization on a single image
+"""
+
 import argparse
+import open_clip
 import sys
 from PIL import Image
+from optim_utils import read_json, optimize_prompt
 
 if len(sys.argv) < 2:
     sys.exit("""Usage: python run.py path-to-image [path-to-image-2 ...]
 Passing multiple images will optimize a single prompt across all passed images, useful for style transfer.
 """)
-
-config_path = "sample_config.json"
+CONFIG_PATH = "sample_config.json"
 
 image_paths = sys.argv[1:]
 
@@ -22,15 +25,15 @@ print("Initializing...")
 
 # load args
 args = argparse.Namespace()
-args.__dict__.update(read_json(config_path))
+args.__dict__.update(read_json(CONFIG_PATH))
 
 # You may modify the hyperparamters here
 args.print_new_best = True
 
 # load CLIP model
-device = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 model, _, preprocess = open_clip.create_model_and_transforms(
-    args.clip_model, pretrained=args.clip_pretrain, device=device)
+    args.clip_model, pretrained=args.clip_pretrain, device=DEVICE)
 
 print(f"Running for {args.iter} steps.")
 if getattr(args, 'print_new_best', False) and args.print_step is not None:
