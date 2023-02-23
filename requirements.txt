@@ -4,3 +4,4 @@ sentence-transformers==2.2.2
 ftfy==6.1.1
 mediapy==1.1.2
 diffusers==0.11.1
+pylint==2.16.2
