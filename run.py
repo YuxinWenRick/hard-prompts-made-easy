@@ -3,9 +3,10 @@ the following module allows you to run the optimization on a single image
 """
 
 import argparse
-import open_clip
 import sys
 from PIL import Image
+import open_clip
+import torch
 from optim_utils import read_json, optimize_prompt
 
 if len(sys.argv) < 2:
@@ -45,6 +46,6 @@ learned_prompt = optimize_prompt(
     model,
     preprocess,
     args,
-    device,
+    DEVICE,
     target_images=images)
 print(learned_prompt)
