@@ -20,5 +20,5 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi 
       - name: Lint with Pylint
         run: |
-          pylint src
+          pylint optim_utils.py
   
