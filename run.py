@@ -5,8 +5,8 @@ the following module allows you to run the optimization on a single image
 import argparse
 import sys
 from PIL import Image
-import open_clip
 import torch
+import open_clip
 from optim_utils import read_json, optimize_prompt
 
 if len(sys.argv) < 2:
