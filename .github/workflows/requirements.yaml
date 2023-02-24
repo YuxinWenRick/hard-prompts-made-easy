@@ -1,4 +1,4 @@
-name: Install Requirements
+name: Install Requirements & Code Formatting
 
 on:
   push:
