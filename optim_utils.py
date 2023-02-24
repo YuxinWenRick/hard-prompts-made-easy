@@ -4,8 +4,8 @@ import requests
 from io import BytesIO
 from PIL import Image
 from statistics import mean
-import copy
 import json
+import copy
 from typing import Any, Mapping
 
 import open_clip
