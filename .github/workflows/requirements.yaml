@@ -19,3 +19,9 @@ jobs:
         python-version: '3.9'
     - name: Install Requirements
       run: pip install -r requirements.txt
+      
+    - name: Install dependencies
+      run: pip install black
+
+    - name: Run Black
+      run: black .
