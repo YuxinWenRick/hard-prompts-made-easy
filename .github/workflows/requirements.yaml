@@ -20,7 +20,7 @@ jobs:
     - name: Install Requirements
       run: pip install -r requirements.txt
       
-    - name: Install dependenciess
+    - name: Install dependencies
       run: pip install black
 
     - name: Run Black
