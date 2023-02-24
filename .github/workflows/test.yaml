@@ -23,5 +23,11 @@ jobs:
     - name: Install dependencies
       run: pip install black
 
+    - name: Install pylint
+      run: pip install pylint
+
+    - name: Run Pylint
+      run: pylint --disable=all $(git ls-files '*.py')
+
     - name: Run Black
       run: black .
