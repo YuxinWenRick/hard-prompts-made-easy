@@ -2,6 +2,7 @@ import unittest
 import torch
 from unittest import mock
 import argparse
+from optim_utils import optimize_prompt
 
 class TestOptimizePrompt(unittest.TestCase):
     def test_optimize_prompt(self):
