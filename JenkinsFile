@@ -2,22 +2,24 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Install dependencies') {
             steps {
-                sh 'python3 -m pylint run.py' // Runs pylint workflow
+                sh 'pip3 install -r requirements.txt'
             }
         }
-        stage('Test') {
+        stage('Code analysis') {
             steps {
-                sh 'pytest test.py/' // Runs test workflow
+                sh 'python3 -m pylint run.py'
+            }
+        }
+        stage('Run tests') {
+            steps {
+                sh 'python3 -m pytest tests.py'
             }
         }
         stage('Deploy') {
             steps {
-                sh 'codeql database analyze ./codeql-db --format=sarif-latest -o codeql-results.sarif' // Runs codeql analysis
-                // Uploads the CodeQL results to GitHub Actions
-                // You'll need to replace <GITHUB_TOKEN> with a valid personal access token or GitHub App token with repo scope
-                sh 'curl -X POST -H "Authorization: Bearer <GITHUB_TOKEN>" -H "Content-Type: application/json" -d @./codeql-results.sarif https://api.github.com/repos/<USERNAME>/<REPO_NAME>/code-scanning/sarifs'
+                sh 'python3 deploy.py'
             }
         }
     }
