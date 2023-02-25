@@ -21,7 +21,7 @@ class TestOptimizePrompt(unittest.TestCase):
         args.print_new_best = True
         args.print_step = None
         device = "cpu"
-        image_path = 'test_image.jpg'
+        image_path = 'test-image.jpg'
         image = Image.new('RGB', (256, 256), color='red')
         image.save(image_path)
         image_paths = [image_path]
