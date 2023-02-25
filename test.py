@@ -1,3 +1,5 @@
+import unittest
+
 from unittest import mock
 
 class TestOptimizePrompt(unittest.TestCase):
