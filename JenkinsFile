@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('verify act installation') {
       steps {
-        sh 'python --version'
+        sh 'python3 --version'
       }
     }
    }
