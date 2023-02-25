@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'python3 -m pylint run.py' // Runs pylint workflow
+                sh 'python -m pylint run.py' // Runs pylint workflow
             }
         }
         stage('Test') {
