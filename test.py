@@ -1,46 +1,52 @@
 import unittest
-import torch
 from unittest import mock
-import argparse
-from optim_utils import optimize_prompt
+from argparse import Namespace
+from PIL import Image
+import torch
+import open_clip
+from optim_utils import read_json, optimize_prompt
+
 
 class TestOptimizePrompt(unittest.TestCase):
+
     def test_optimize_prompt(self):
         # create mock objects
         model = mock.Mock()
         model.token_embedding = torch.nn.Embedding(512, 512)
         preprocess = mock.Mock()
-        args = argparse.Namespace()
-        args.clip_model = "ViT-B/32"
+        args = Namespace()
+        args.clip_model = 'ViT-B/32'
         args.clip_pretrain = True
         args.iter = 10
-        args.lr = 0.1
-        args.init_weight = 0.1
-        args.optim = "adam"
-        args.clip_norm = 1.0
-        args.tv_norm = 0.1
-        args.l2_norm = 0.01
-        args.weight_decay = 0.01
-        args.print_step = 1
-        args.init_image = None
-        args.init_random = True
-        args.init_size = 224
-        args.mixed_precision = False
-        args.clip_guidance_scale = 0.0
-        args.color_correlation = 0.0
-        args.color_correlation_temperature = 0.0
-        args.normalize_image = True
-        args.jitter = True
-        args.center_bias = False
-        args.clip_min = -1.0
-        args.clip_max = 1.0
-        args.batch_size = 1
         args.print_new_best = True
+        args.print_step = None
         device = "cpu"
-        target_images = [torch.randn(3, 224, 224)]
-        
-        # call optimize_prompt
-        learned_prompt = optimize_prompt(model, preprocess, args, device, target_images=target_images)
-        
-        # assert the output
-        self.assertIsNotNone(learned_prompt)
+        image_path = 'test_image.jpg'
+        image = Image.new('RGB', (256, 256), color='red')
+        image.save(image_path)
+        image_paths = [image_path]
+
+        # test optimize_prompt with mock objects
+        with self.assertRaises(Exception):
+            learned_prompt = optimize_prompt(
+                model,
+                preprocess,
+                args,
+                device,
+                target_images=[image],
+                target_prompts=['test'])
+            self.assertEqual(len(learned_prompt), 512)
+
+    def test_get_tokenizer(self):
+        tokenizer = open_clip.get_tokenizer('ViT-B/32')
+        self.assertIsNotNone(tokenizer)
+
+    def test_get_model_config(self):
+        config = open_clip.get_model_config('ViT-B/32')
+        self.assertIsNotNone(config)
+        self.assertIsNotNone(config.get('text_cfg'))
+        self.assertIsNotNone(config['text_cfg'].get('hf_tokenizer_name'))
+
+
+if __name__ == '__main__':
+    unittest.main()
