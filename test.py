@@ -12,7 +12,8 @@ class TestOptimizePrompt(unittest.TestCase):
         # initialize args
         args = argparse.Namespace()
         args.clip_model = 'ViT-B/32'
-        args.clip_pretrain = True
+        args.clip_pretrain = "openai"
+
         args.image_size = 224
         args.init_lr = 0.1
         args.iter = 200
