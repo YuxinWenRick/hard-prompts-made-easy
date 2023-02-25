@@ -1,5 +1,5 @@
 import unittest
-
+import torch
 from unittest import mock
 
 class TestOptimizePrompt(unittest.TestCase):
