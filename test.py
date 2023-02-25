@@ -1,4 +1,6 @@
 import unittest
+import argparse
+
 import torch
 from PIL import Image
 from optim_utils import optimize_prompt
