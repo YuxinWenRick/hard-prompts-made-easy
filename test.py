@@ -1,5 +1,4 @@
 def test_tokenize():
-    texts = ["This is a test.", "This is another test."]
-    expected_result = torch.tensor([[49408,   364,    16,   939,  4054,     4,   175, 49409,     0, ... 0],
-                                    [49408,   364,    16,   939,  4054,    38,   308,  4413,  4054, ... 0]])
-    assert torch.allclose(tokenize(texts), expected_result)
+    expected_result = torch.tensor([[49408, 364, 16, 939, 4054, 4, 175, 49409, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[49408, 364, 16, 939, 4054, 4, 175, 49409, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+    result = tokenize(["A photo of a family of ducks walking down the street"])
+    assert torch.equal(expected_result, result), f"Expected {expected_result}, but got {result}"
