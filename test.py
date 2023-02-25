@@ -1,49 +1,23 @@
-import unittest
-import argparse
-import open_clip
-
-import torch
+import os
+import pytest
 from PIL import Image
-from optim_utils import optimize_prompt
+from run import optimize_image
 
-class TestOptimizePrompt(unittest.TestCase):
-    
-    def test_optimize_prompt(self):
-        # initialize args
-        args = argparse.Namespace()
-        args.clip_model = 'ViT-B/32'
-        args.clip_pretrain = "openai"
+# Set the path to the test image
+IMAGE_PATH = "test-image.jpeg"
 
-        args.image_size = 224
-        args.init_lr = 0.1
-        args.iter = 200
-        args.beta1 = 0.9
-        args.beta2 = 0.999
-        args.epsilon = 1e-08
-        args.weight_decay = 0.0
-        args.num_iterations = 1
-        args.blur_every = 4
-        args.grad_clip_norm = 0.1
-        args.center_bias = False
-        args.mode = 'keep'
-        args.seed = 42
-        
-        # load test image
-        image_path = 'test-image.jpeg'
-        target_image = Image.open(image_path)
-        
-        # load CLIP model
-        DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-        model, _, preprocess = open_clip.create_model_and_transforms(
-            args.clip_model, pretrained=args.clip_pretrain, device=DEVICE)
-        
-        # run optimization
-        learned_prompt = optimize_prompt(
-            model,
-            preprocess,
-            args,
-            DEVICE,
-            target_images=[target_image])
-        
-        # assert result is a string
-        self.assertIsInstance(learned_prompt, str)
+def test_optimize_image():
+    # Load the test image
+    image = Image.open(IMAGE_PATH)
+
+    # Optimize the prompt for the image
+    learned_prompt = optimize_image(image)
+
+    # Assert that the learned prompt is not empty
+    assert learned_prompt
+
+    # Assert that the learned prompt is a string
+    assert isinstance(learned_prompt, str)
+
+    # Assert that the learned prompt contains no whitespace
+    assert not any(char.isspace() for char in learned_prompt)
