@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'python -m pylint run.py' // Runs pylint workflow
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'pytest test.py/' // Runs test workflow
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'codeql database analyze ./codeql-db --format=sarif-latest -o codeql-results.sarif' // Runs codeql analysis
+                // Uploads the CodeQL results to GitHub Actions
+                // You'll need to replace <GITHUB_TOKEN> with a valid personal access token or GitHub App token with repo scope
+                sh 'curl -X POST -H "Authorization: Bearer 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" -H "Content-Type: application/json" -d @./codeql-results.sarif https://api.github.com/repos/<USERNAME>/<REPO_NAME>/code-scanning/sarifs'
+            }
+        }
+    }
+}
