@@ -4,9 +4,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                withPythonEnv('my-python-env') {
-                    sh 'python -m pylint run.py'
-                }    
+                sh 'pylint run.py'
+                  
             }
         }
         stage('Test') {
