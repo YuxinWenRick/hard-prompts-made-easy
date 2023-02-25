@@ -4,8 +4,9 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'python -m pylint run.py' // Runs pylint workflow
-            }
+                withPythonEnv('my-python-env') {
+                    sh 'python -m pylint run.py'
+                    }
         }
         stage('Test') {
             steps {
