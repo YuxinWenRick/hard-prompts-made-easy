@@ -1,7 +1,7 @@
 import unittest
 import torch
 from PIL import Image
-from optimize_prompt import optimize_prompt
+from optim_utils import optimize_prompt
 
 class TestOptimizePrompt(unittest.TestCase):
     
