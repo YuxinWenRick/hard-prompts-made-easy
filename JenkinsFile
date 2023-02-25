@@ -6,7 +6,8 @@ pipeline {
             steps {
                 withPythonEnv('my-python-env') {
                     sh 'python -m pylint run.py'
-                    }
+                }    
+            }
         }
         stage('Test') {
             steps {
