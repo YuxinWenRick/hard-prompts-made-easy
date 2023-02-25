@@ -14,7 +14,8 @@ pipeline {
         }
         stage('Run tests') {
             steps {
-                sh 'python3 -m pytest tests.py'
+                sh 'pip3 install pytest'
+                sh 'python3 -m pytest test.py'
             }
         }
         stage('Deploy') {
