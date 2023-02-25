@@ -1,5 +1,6 @@
 import unittest
 import argparse
+import open_clip
 
 import torch
 from PIL import Image
