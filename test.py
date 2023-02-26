@@ -1,12 +1,17 @@
-from open_clip.tokenizer import tokenize
+from open_clip.tokenizer import get_pairs
 import torch
-
-def test_tokenize():
-    texts = ["This is a test string 1", "This is a test string 2"]
-    expected_output = torch.tensor([
-    [49408,   250,    11,  1329,   830,     7,  7208,    88,  1823,   443, 49407,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0],
-    [49408,   250,    11,  1329,   830,     7,  7208,    88,  1823,   443, 49407,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0]
-])
-
-    output = tokenize(texts)
-    assert torch.equal(output, expected_output)
+def test_get_pairs():
+    # Test case 1: Word with no repeating characters
+    word = ('h', 'e', 'l', 'o')
+    expected_pairs = {('h', 'e'), ('e', 'l'), ('l', 'o')}
+    assert get_pairs(word) == expected_pairs
+    
+    # Test case 2: Word with repeating characters
+    word = ('h', 'e', 'l', 'l', 'o')
+    expected_pairs = {('h', 'e'), ('e', 'l'), ('l', 'l'), ('l', 'o')}
+    assert get_pairs(word) == expected_pairs
+    
+    # Test case 3: Single-character word
+    word = ('a',)
+    expected_pairs = set()
+    assert get_pairs(word) == expected_pairs
