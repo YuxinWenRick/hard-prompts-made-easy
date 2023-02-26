@@ -10,8 +10,18 @@ pipeline {
         stage('Code analysis') {
             steps {
                 sh 'python3 -m pylint run.py'
+                sh 
             }
         }
+        stage('CodeQL analysis') {
+            steps {
+                withEnv(['GITHUB_TOKEN=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']) {
+                    sh 'codeql database create --language=python --source-root=. --database=python-database'
+                    sh 'codeql analyze --database=python-database --output=codeql-results.sarif'
+                }
+            }
+        }
+
         stage('Run tests') {
             steps {
                 sh 'pip3 install pytest'
