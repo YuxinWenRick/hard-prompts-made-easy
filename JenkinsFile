@@ -16,7 +16,7 @@ pipeline {
         stage('CodeQL analysis') {
             steps {
                 withEnv(['GITHUB_TOKEN=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']) {
-                    sh '/usr/local/bin/codeql database create --language=python --source-root=. CodeQlDb3'
+                    sh '/usr/local/bin/codeql database create --language=python --source-root=. CodeQlDb4'
                 }
             }
         }
@@ -30,7 +30,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh 'python3 run.py'
+                echo 'deploying'
             }
         }
     }
