@@ -7,14 +7,7 @@ pipeline {
                 sh 'pip3 install -r requirements.txt'
             }
         }
-        stage('Install CodeQL') {
-            steps {
-                sh 'curl -L https://github.com/github/codeql-cli-binaries/releases/latest/download/codeql-linux64.zip -o codeql.zip'
-                sh 'unzip codeql.zip -d /usr/local/bin'
-                sh 'chmod u+x /usr/local/bin/codeql'
-                sh 'rm codeql.zip'
-            }
-        }
+       
         stage('Code analysis') {
             steps {
                 sh 'python3 -m pylint run.py'
