@@ -10,7 +10,6 @@ pipeline {
         stage('Code analysis') {
             steps {
                 sh 'python3 -m pylint run.py'
-                sh 
             }
         }
         stage('CodeQL analysis') {
