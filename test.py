@@ -1,5 +1,4 @@
 from open_clip.tokenizer import get_pairs
-import torch
 def test_get_pairs():
     # Test case 1: Word with no repeating characters
     word = ('h', 'e', 'l', 'o')
