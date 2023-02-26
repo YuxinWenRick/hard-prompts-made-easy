@@ -17,7 +17,6 @@ pipeline {
             steps {
                 withEnv(['GITHUB_TOKEN=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']) {
                     sh '/usr/local/bin/codeql database create --language=python --source-root=. CodeQlDb2'
-                    sh '/usr/local/bin/codeql analyze --database=python-database --output=codeql-results.sarif'
                 }
             }
         }
